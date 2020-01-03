@@ -1,11 +1,19 @@
 package main;
 
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.*;
 
 public class SkipList<T extends Comparable<T>> implements Collection<T> {
+	private Node<T> head;
+	private int size;
+	IndexList<Integer> indexList;
+	private final int indexListSize = 4;
 
-	
+	public SkipList() {
+		this.head = new Node<>();
+		this.size = 0;
+		indexList = new IndexList<Integer>((Node<Integer>) head, this.indexListSize);
+	}
+
 	/**
 	 * Returns the value at the specified position
 	 * 
@@ -15,7 +23,6 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 	public T get(int index) {
 		return null;
 	}
-	
 
 	/**
 	 * Inserts a value into the SkipList.
@@ -24,11 +31,12 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 	 * @return 
 	 */
 	@Override
-	public boolean add(T e) {
-		// TODO Auto-generated method stub
+	public boolean add(T value) {
+
+
 		return false;
 	}
-	
+
 	/**
 	 * Checks, whether a number is contained in the list.
 	 * @param value
@@ -55,8 +63,12 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-	
-	
+
+	@Override
+	public String toString() {
+		return super.toString();
+	}
+
 	//#####################################
 	//do not change the following methods!!
 	//#####################################
@@ -148,6 +160,5 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 		}
 		return a;
 	}
-
 
 }

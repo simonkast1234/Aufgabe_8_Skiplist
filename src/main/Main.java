@@ -4,7 +4,8 @@ public class Main {
 	
 	public static void main(String[] args) {
 		SkipList<Integer> list = new SkipList<>();
-		
+		System.out.println(list.indexList);
+		/*
 		list.add(1);
 		list.add(3);
 		list.add(6);
@@ -26,7 +27,11 @@ public class Main {
 				+ "head -> 1 -> 7 -> 21 -> 36 -> null\r\n" + 
 				"head -> 1 -> 3 -> 6 -> 7 -> 12 -> 14 -> 21 -> 34 -> 36 -> 37 -> null\r\n" + 
 				"\nis:\n%s\n",list);
+
+		 */
 	}
 
-	
+
+
+
 }
