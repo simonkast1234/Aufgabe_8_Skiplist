@@ -3,33 +3,12 @@ package main;
 import java.util.*;
 
 public class SkipList<T extends Comparable<T>> implements Collection<T> {
-	private Node<T> head;
-	private int size;
-	IndexList<Integer> indexList;
-	private final int indexListSize = 4;
+	IndexList<T> indexList;
 
 	public SkipList() {
-		this.head = new Node<>();
-		this.size = 0;
-		indexList = new IndexList<Integer>((Node<Integer>) head, this.indexListSize);
+		indexList = new IndexList<T>(new Node<T>(), 4);
 	}
 
-	/**
-	 * Returns the value at the specified position
-	 * 
-	 * @param index
-	 * @return
-	 */
-	public T get(int index) {
-		return null;
-	}
-
-	/**
-	 * Inserts a value into the SkipList.
-	 * 
-	 * @param value
-	 * @return 
-	 */
 	@Override
 	public boolean add(T value) {
 
@@ -37,37 +16,33 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 		return false;
 	}
 
-	/**
-	 * Checks, whether a number is contained in the list.
-	 * @param value
-	 * @return boolean value whether number is contained in list
-	 */
+
+	public T get(int index) {
+		return null;
+	}
+
 	public boolean contains(T value) {
 		return false;
 	}
-	
-	/**
-	 * removes all elements form the list 
-	 */
-	@Override
+
 	public void clear() {
 		// TODO Auto-generated method stub
 		
 	}
-	
-	/**
-	 * @return the size of the list
-	 */
-	@Override
+
 	public int size() {
 		// TODO Auto-generated method stub
 		return 0;
 	}
 
-	@Override
 	public String toString() {
 		return super.toString();
 	}
+
+
+
+
+
 
 	//#####################################
 	//do not change the following methods!!

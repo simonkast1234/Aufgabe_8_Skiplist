@@ -1,6 +1,6 @@
 package main;
 
-public class IndexList<T> {
+public class IndexList<T extends Comparable<T>> {
     private Node<T> head;
     private int size;
 
