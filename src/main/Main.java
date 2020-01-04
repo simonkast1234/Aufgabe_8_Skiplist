@@ -16,6 +16,11 @@ public class Main {
 			list.add(value);
 			System.out.println(list);
 		}
+		while(true) {
+			value = IOTools.readInt("int number to get: ");
+			if(value == 999) break;
+			System.out.println(list.get(value));
+		}
 		System.out.println("bye");
 
 		/*

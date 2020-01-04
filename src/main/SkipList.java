@@ -7,9 +7,10 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 	private Node<T> head;
 	private int baseListSize;
 	private int intervalSize;
+	private int intervalModulo;
 
 	public SkipList() {
-		this.head = new Node<T>();
+		this.head = new Node<>();
 		this.baseListSize = 0;
 		addIndexNodes(this.head, SkipList.NUMBEROFINDEXNODES);
 		System.out.println("index list created!");
@@ -17,13 +18,15 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 
 	private void addIndexNodes(Node<T> currentNode, int counter) {
 		if(counter <= 0) return;
-		currentNode.next = new Node<T>();
+		currentNode.next = new Node<>();
 		addIndexNodes(currentNode.next, (counter - 1));
 	}
 
-
+	//#####################################
+	// add
+	//#####################################
 	public boolean add(T value) {
-		if( addBaseList(detectAddingInterval(this.head.next, value), value) ) {
+		if(addBaseList(detectAddingInterval(this.head.next, value), value) ) {
 			this.baseListSize++;
 			makeReferences();
 			return true;
@@ -35,7 +38,8 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 	 * sets new references from index nodes to base nodes in the right interval length.
 	 */
 	private void makeReferences() {
-		this.intervalSize = (int) (( this.baseListSize / SkipList.NUMBEROFINDEXNODES) + 0.5); // todo: improve algorithm
+		this.intervalSize = this.baseListSize / SkipList.NUMBEROFINDEXNODES;
+		this.intervalModulo = this.baseListSize % SkipList.NUMBEROFINDEXNODES;
 		makeReferences(this.head.next, 0, this.head.next.reference, 0);
 	}
 	/**
@@ -47,16 +51,23 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 	 * @param baseCounter the counter of how many base nodes left to reach the desired one
 	 */
 	private void makeReferences(Node<T> currentIndexNode, int indexCounter, Node<T> currentBaseNode, int baseCounter) {
-		// if reached desired base node, refer index node to it and start method for next index
-		if(indexCounter < SkipList.NUMBEROFINDEXNODES && baseCounter <= 0) {
-			currentIndexNode.reference = currentBaseNode;
-			currentIndexNode.value = currentBaseNode.value;
-			makeReferences(currentIndexNode.next, (indexCounter + 1), currentBaseNode, intervalSize);
-		}
+		if(indexCounter < SkipList.NUMBEROFINDEXNODES) {
+			// if reached desired base node, refer index node to it and start method for next index
+			if(baseCounter <= 0 || currentBaseNode.next == null) {
+				currentIndexNode.reference = currentBaseNode;
+				currentIndexNode.value = currentBaseNode.value;
+				if(this.intervalModulo > 0) {
+					this.intervalModulo--;
+					makeReferences(currentIndexNode.next, (indexCounter + 1), currentBaseNode, intervalSize + 1);
+				} else {
+					makeReferences(currentIndexNode.next, (indexCounter + 1), currentBaseNode, intervalSize);
+				}
+			}
 
-		// continue recursion until reached desired base node
-		else if(indexCounter < SkipList.NUMBEROFINDEXNODES) {
-			makeReferences(currentIndexNode, indexCounter, currentBaseNode.next, (baseCounter - 1) );
+			// continue recursion until reached desired base node (base node != null)
+			else {
+				makeReferences(currentIndexNode, indexCounter, currentBaseNode.next, (baseCounter - 1) );
+			}
 		}
 	}
 
@@ -64,7 +75,7 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 		// if list is empty
 		if(this.baseListSize <= 0) return null;
 
-		// value is in the last interval OR value smaller than or equal to next index node's value
+		// value is in the last interval or value smaller than or equal to next index node's value
 		if(currentNode.next == null || value.compareTo(currentNode.next.value) <= 0) {
 			return currentNode.reference;
 		}
@@ -85,14 +96,13 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 	public boolean addBaseList(Node<T> currentNode, T value) {
 		// add first node if base list is empty
 		if(this.baseListSize == 0) {
-			this.head.next.reference = new Node<T>(null, value);
+			this.head.next.reference = new Node<>(null, value);
 			return true;
 		}
 
 		// smallest value of list
 		else if(value.compareTo(currentNode.value) < 0) {
-			Node<T> tmp = currentNode;
-			this.head.next.reference = new Node<T>(tmp, value);
+			this.head.next.reference = new Node<>(currentNode, value);
 			return true;
 		}
 
@@ -109,21 +119,21 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 	/**
 	 * recursive method to add the new value. Value is always bigger than current
 	 * node's value.
-	 * @param currentNode
-	 * @param value
-	 * @return
+	 * @param currentNode the node working on
+	 * @param value the value to be added
+	 * @return whether or not adding was successful
 	 */
 	private boolean addBaseListRecursive(Node<T> currentNode, T value) {
 		// biggest value of entire list
 		if(currentNode.next == null) {
-			currentNode.next = new Node<T>(null, value);
+			currentNode.next = new Node<>(null, value);
 			return true;
 		}
 
 		// value is smaller than next node's value
 		else if(value.compareTo(currentNode.next.value) < 0) {
 			Node<T> tmp = currentNode.next;
-			currentNode.next = new Node<T>(tmp, value);
+			currentNode.next = new Node<>(tmp, value);
 			return true;
 		}
 
@@ -138,12 +148,13 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 		}
 	}
 
-
+	//#####################################
+	// toString
+	//#####################################
 	public String toString() {
 		return "head -> " + toStringIndex("", this.head.next, this.head.next.reference)
 				+ "\n        " + toStringBase("", this.head.next.reference);
 	}
-
 	private String toStringIndex(String s, Node<T> currentIndexNode, Node<T> currentBaseNode) {
 		// no base node to compare, just print index node
 		if(currentBaseNode == null) {
@@ -171,22 +182,54 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 			}
 		}
 	}
-
 	private String toStringBase(String s, Node<T> currentNode) {
 		if(currentNode == null) return s;
 		if(currentNode.next == null) return s + currentNode.value + " ";
 		return toStringBase(s + currentNode.value + " ", currentNode.next);
 	}
 
-
-
-
-
+	//#####################################
+	// get
+	//#####################################
 	public T get(int index) {
-		return null;
+		if(index < 1 || index > this.baseListSize) return null;
+		return get(this.head.next.reference, index);
+	}
+	private T get(Node<T> currentNode, int index) {
+		if(index == 1) {
+			return currentNode.value;
+		}
+		return get(currentNode.next, index - 1);
 	}
 
+	//#####################################
+	// contains
+	//#####################################
 	public boolean contains(T value) {
+		if(this.baseListSize == 0) {
+			return false;
+		}
+		return contains(detectAddingInterval(this.head.next, value), value);
+	}
+	private boolean contains(Node<T> currentNode,  T value) {
+		// if at the end of the list -> not contained
+		if(currentNode == null) {
+			return false;
+		}
+
+		// if same value as current node
+		if(value.compareTo(currentNode.value) == 0) {
+			return true;
+		}
+		// if value bigger than current node's value -> recursion
+		if(value.compareTo(currentNode.value) > 0) {
+			return contains(currentNode.next, value);
+		}
+		// if value smaller than current node's value -> not contained
+		if(value.compareTo(currentNode.value) < 0) {
+			return false;
+		}
+		System.out.println("something strange happened in contains method");
 		return false;
 	}
 
