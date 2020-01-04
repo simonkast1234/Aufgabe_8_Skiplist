@@ -12,13 +12,13 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 		this.head = new Node<T>();
 		this.baseListSize = 0;
 		addIndexNodes(this.head, SkipList.NUMBEROFINDEXNODES);
+		System.out.println("index list created!");
 	}
 
 	private void addIndexNodes(Node<T> currentNode, int counter) {
 		if(counter <= 0) return;
 		currentNode.next = new Node<T>();
 		addIndexNodes(currentNode.next, (counter - 1));
-		System.out.println("index list created!");
 	}
 
 
@@ -26,7 +26,6 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 		if( addBaseList(detectAddingInterval(this.head.next, value), value) ) {
 			this.baseListSize++;
 			makeReferences();
-			System.out.println(value + " has been added!");
 			return true;
 		}
 		return false;
@@ -36,7 +35,7 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 	 * sets new references from index nodes to base nodes in the right interval length.
 	 */
 	private void makeReferences() {
-		this.intervalSize = this.baseListSize / SkipList.NUMBEROFINDEXNODES; // todo: improve algorithm
+		this.intervalSize = (int) (( this.baseListSize / SkipList.NUMBEROFINDEXNODES) + 0.5); // todo: improve algorithm
 		makeReferences(this.head.next, 0, this.head.next.reference, 0);
 	}
 	/**
@@ -62,9 +61,12 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 	}
 
 	private Node<T> detectAddingInterval(Node<T> currentNode, T value) {
+		// if list is empty
+		if(this.baseListSize <= 0) return null;
+
 		// value is in the last interval OR value smaller than or equal to next index node's value
 		if(currentNode.next == null || value.compareTo(currentNode.next.value) <= 0) {
-			return currentNode;
+			return currentNode.reference;
 		}
 
 		// value bigger than next index node's value
@@ -138,20 +140,41 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 
 
 	public String toString() {
-		return "head -> " + toStringIndex("", this.head.next)
+		return "head -> " + toStringIndex("", this.head.next, this.head.next.reference)
 				+ "\n        " + toStringBase("", this.head.next.reference);
 	}
 
-	private String toStringIndex(String s, Node<T> currentNode) {
-		if(currentNode.next == null) return s + currentNode.value;
-		s += currentNode.value;
-		for (int i = 0; i < this.intervalSize; i++) {
-			s += "  ";
+	private String toStringIndex(String s, Node<T> currentIndexNode, Node<T> currentBaseNode) {
+		// no base node to compare, just print index node
+		if(currentBaseNode == null) {
+			s += currentIndexNode.value;
+			// end, when last index was printed out.
+			if(currentIndexNode.next == null) return s + " ";
+			else return toStringIndex(s + " ", currentIndexNode.next, null);
 		}
-		return toStringIndex(s + " ", currentNode.next);
+		// compare base and index node
+		else {
+			// base note != index node -> print spaces
+			if(currentIndexNode.value.compareTo(currentBaseNode.value) > 0) {
+				for (int i = 0; i < String.valueOf(currentBaseNode.value).length(); i++) {
+					s += " ";
+				}
+				return toStringIndex(s + " ", currentIndexNode, currentBaseNode.next);
+
+			// base note == index note -> print index node
+			} else {
+				s += currentIndexNode.value;
+
+				// end, when last index was printed out.
+				if(currentIndexNode.next == null) return s + " ";
+				else return toStringIndex(s + " ", currentIndexNode.next, currentBaseNode.next);
+			}
+		}
 	}
+
 	private String toStringBase(String s, Node<T> currentNode) {
-		if(currentNode.next == null) return s + currentNode.value;
+		if(currentNode == null) return s;
+		if(currentNode.next == null) return s + currentNode.value + " ";
 		return toStringBase(s + currentNode.value + " ", currentNode.next);
 	}
 

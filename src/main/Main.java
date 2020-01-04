@@ -1,10 +1,23 @@
 package main;
 
+import Prog1Tools.IOTools;
+
 public class Main {
-	
+
+
 	public static void main(String[] args) {
 		SkipList<Integer> list = new SkipList<>();
 		System.out.println(list);
+
+		int value = 0;
+		while(true) {
+			value = IOTools.readInt("int number to add: ");
+			if(value == 999) break;
+			list.add(value);
+			System.out.println(list);
+		}
+		System.out.println("bye");
+
 		/*
 		list.add(1);
 		list.add(3);
@@ -16,7 +29,8 @@ public class Main {
 		list.add(34);
 		list.add(36);
 		list.add(37);
-		
+
+
 		System.out.printf("test get(5) should be:14 is:%d\n",list.get(5));
 		
 		System.out.printf("test contains(7) should be:true is:%b\n",list.contains(7));
@@ -28,7 +42,11 @@ public class Main {
 				"head -> 1 -> 3 -> 6 -> 7 -> 12 -> 14 -> 21 -> 34 -> 36 -> 37 -> null\r\n" + 
 				"\nis:\n%s\n",list);
 
+
 		 */
+
+
+
 	}
 
 
