@@ -4,7 +4,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 		SkipList<Integer> list = new SkipList<>();
-		System.out.println(list.indexList);
+		System.out.println(list);
 		/*
 		list.add(1);
 		list.add(3);

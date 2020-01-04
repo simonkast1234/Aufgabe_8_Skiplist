@@ -2,19 +2,21 @@ package main;
 
 public class IndexList<T extends Comparable<T>> {
     private Node<T> head;
-    private int size;
+    private int numberOfIndexNodes;
 
-    public IndexList(Node<T> head, int size) {
+    public IndexList(Node<T> head, int numberOfIndexNodes) {
         this.head = head;
-        this.size = size;
-        initiallyAdd(this.head, size);
+        this.numberOfIndexNodes = numberOfIndexNodes;
+        initiallyAdd(this.head, numberOfIndexNodes);
     }
 
-    private boolean initiallyAdd(Node<T> currentNode, int counter) {
-        if(counter <= 0) return false;
-        currentNode.next = new Node<T>();
-        initiallyAdd(currentNode.next, (counter - 1));
-        return true;
+
+
+    public boolean add(T value) {
+
+
+
+
     }
 
     public String toString() {
