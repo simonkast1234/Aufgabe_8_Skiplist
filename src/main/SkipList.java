@@ -13,25 +13,12 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 		this.head = new Node<>();
 		this.baseListSize = 0;
 		addIndexNodes(this.head, SkipList.NUMBEROFINDEXNODES);
-		System.out.println("index list created!");
 	}
 
 	private void addIndexNodes(Node<T> currentNode, int counter) {
 		if(counter <= 0) return;
 		currentNode.next = new Node<>();
 		addIndexNodes(currentNode.next, (counter - 1));
-	}
-
-	//#####################################
-	// add
-	//#####################################
-	public boolean add(T value) {
-		if(addBaseList(detectAddingInterval(this.head.next, value), value) ) {
-			this.baseListSize++;
-			makeReferences();
-			return true;
-		}
-		return false;
 	}
 
 	/**
@@ -51,9 +38,18 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 	 * @param baseCounter the counter of how many base nodes left to reach the desired one
 	 */
 	private void makeReferences(Node<T> currentIndexNode, int indexCounter, Node<T> currentBaseNode, int baseCounter) {
+
 		if(indexCounter < SkipList.NUMBEROFINDEXNODES) {
+
+			// if list is empty (currentBaseNode == null), reference all index nodes to null
+			if(currentBaseNode == null) {
+				currentIndexNode.reference = null;
+				currentIndexNode.value = null;
+				makeReferences(currentIndexNode.next, (indexCounter + 1), null, intervalSize);
+			}
+
 			// if reached desired base node, refer index node to it and start method for next index
-			if(baseCounter <= 0 || currentBaseNode.next == null) {
+			else if(baseCounter <= 0 || currentBaseNode.next == null) {
 				currentIndexNode.reference = currentBaseNode;
 				currentIndexNode.value = currentBaseNode.value;
 				if(this.intervalModulo > 0) {
@@ -84,6 +80,18 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 		else {
 			return detectAddingInterval(currentNode.next, value);
 		}
+	}
+
+	//#####################################
+	// add
+	//#####################################
+	public boolean add(T value) {
+		if(addBaseList(detectAddingInterval(this.head.next, value), value) ) {
+			this.baseListSize++;
+			makeReferences();
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -192,11 +200,11 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 	// get
 	//#####################################
 	public T get(int index) {
-		if(index < 1 || index > this.baseListSize) return null;
+		if(index < 0 || index > this.baseListSize - 1) return null;
 		return get(this.head.next.reference, index);
 	}
 	private T get(Node<T> currentNode, int index) {
-		if(index == 1) {
+		if(index == 0) {
 			return currentNode.value;
 		}
 		return get(currentNode.next, index - 1);
@@ -233,25 +241,21 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 		return false;
 	}
 
+	//#####################################
+	// clear
+	//#####################################
 	public void clear() {
-		// TODO Auto-generated method stub
-		
+		this.head.next.reference = null;
+		this.baseListSize = 0;
+		makeReferences();
 	}
 
+	//#####################################
+	// size
+	//#####################################
 	public int size() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.baseListSize;
 	}
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -274,8 +278,7 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 			return false;
 		}
 	}
-	
-	
+
 	@Override
 	@Deprecated
 	public boolean remove(Object o) {
@@ -315,7 +318,7 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 	@Override
 	public Iterator<T> iterator() {
 		//really slow way to implement this but should be some what understandable
-		return new Iterator<T>() {
+		return new Iterator<>() {
 			int index = 0;
 			@Override
 			public boolean hasNext() {
@@ -347,5 +350,4 @@ public class SkipList<T extends Comparable<T>> implements Collection<T> {
 		}
 		return a;
 	}
-
 }
